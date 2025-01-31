@@ -5,17 +5,16 @@ require_once('../_helpers/strip.php');
 // Désactive le chargement des entités externes pour prévenir XXE
 libxml_disable_entity_loader(true);
 
-// Définit le XML en s'assurant qu'il provient d'une source sécurisée
+// Vérification et définition d'un XML sécurisé
 $xml = isset($_GET['xml']) && !empty($_GET['xml']) ? $_GET['xml'] : '<root><content>No XML found</content></root>';
 
 $document = new DOMDocument();
 
-// Charge le XML de manière sécurisée sans activer les DTD et les entités externes
-$document->loadXML($xml, LIBXML_NOENT); // Supprime LIBXML_DTDLOAD pour éviter XXE
+// Charge le XML de manière sécurisée en empêchant l'accès aux ressources externes
+$document->loadXML($xml, LIBXML_NONET); // Remplacement de LIBXML_NOENT par LIBXML_NONET
 
-// Sécuriser l'importation du DOM XML en SimpleXML
+// Sécurisation de l'importation XML
 $parsedDocument = simplexml_import_dom($document);
 
-// Affichage du contenu du document XML de manière sécurisée
-echo htmlspecialchars($parsedDocument->content, ENT_QUOTES, 'UTF-8'); // Évite XSS
-
+// Affichage sécurisé pour éviter XSS
+echo htmlspecialchars($parsedDocument->content, ENT_QUOTES, 'UTF-8');
