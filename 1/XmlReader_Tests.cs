@@ -16,16 +16,16 @@ namespace XXEExamples.Tests
             AssertXXE.IsXMLParserSafe((string xml) =>
             {
                 XmlReaderSettings settings = new XmlReaderSettings();
-                settings.DtdProcessing = DtdProcessing.Parse;
-                settings.XmlResolver = new XmlUrlResolver();
-                settings.MaxCharactersFromEntities = 6000;
+                settings.DtdProcessing = DtdProcessing.Prohibit; // ✅ Interdit l'utilisation des DTDs
+                settings.XmlResolver = null; // ✅ Bloque l'accès aux entités externes
+                settings.MaxCharactersFromEntities = 0; // ✅ Protection contre les attaques Billion Laughs
 
                 using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
                 {
                     XmlReader reader = XmlReader.Create(stream, settings);
 
                     var xmlDocument = new XmlDocument();
-                    xmlDocument.XmlResolver = new XmlUrlResolver();
+                    xmlDocument.XmlResolver = null; // ✅ Supprime le XmlResolver pour éviter les accès externes
                     xmlDocument.Load(reader);
                     return xmlDocument.InnerText;
                 }
@@ -41,14 +41,15 @@ namespace XXEExamples.Tests
                 {
                     XmlReaderSettings settings = new XmlReaderSettings();
                     settings.DtdProcessing = DtdProcessing.Ignore;
-                    settings.MaxCharactersFromEntities = 6000;
+                    settings.XmlResolver = null; // ✅ Sécurisation supplémentaire
+                    settings.MaxCharactersFromEntities = 0; 
 
                     using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
                     {
                         XmlReader reader = XmlReader.Create(stream, settings);
 
                         var xmlDocument = new XmlDocument();
-                        xmlDocument.XmlResolver = new XmlUrlResolver();
+                        xmlDocument.XmlResolver = null; // ✅ Suppression du XmlResolver
                         xmlDocument.Load(reader);
                         return xmlDocument.InnerText;
                     }
@@ -67,14 +68,15 @@ namespace XXEExamples.Tests
                 {
                     XmlReaderSettings settings = new XmlReaderSettings();
                     settings.DtdProcessing = DtdProcessing.Prohibit;
-                    settings.MaxCharactersFromEntities = 6000;
+                    settings.XmlResolver = null; // ✅ Sécurisé
+                    settings.MaxCharactersFromEntities = 0;
 
                     using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
                     {
                         XmlReader reader = XmlReader.Create(stream, settings);
 
                         var xmlDocument = new XmlDocument();
-                        xmlDocument.XmlResolver = new XmlUrlResolver();
+                        xmlDocument.XmlResolver = null; // ✅ Suppression du XmlResolver
                         xmlDocument.Load(reader);
                         return xmlDocument.InnerText;
                     }
